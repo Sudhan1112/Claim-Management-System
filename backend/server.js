@@ -20,9 +20,6 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: 'https://superlative-starlight-275a0c.netlify.app/',
-  origin: 'http://localhost:3000',
-  origin: 'http://localhost:5173',
   credentials: true
 }));
 app.use(express.json());
