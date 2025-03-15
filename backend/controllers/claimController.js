@@ -35,39 +35,60 @@ export const getUserClaims = async (req, res) => {
   }
 };
 
+// claimController.js - updateClaim function
+import mongoose from 'mongoose';
+
 export const updateClaim = async (req, res) => {
   try {
+    const { id } = req.params;
+    const { status, approvedAmount, comments } = req.body;
+    
+    console.log('Update claim request:', {
+      claimId: id,
+      body: req.body,
+      user: req.user
+    });
+    
+    // Validate ObjectId format
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid claim ID format' });
+    }
+    
     // Only insurers can update claims
     if (req.user.role !== 'insurer') {
       return res.status(403).json({ message: "Access denied. Insurer role required." });
     }
     
-    const { status } = req.body;
-    
     // Validation
-    if (!['Approved', 'Rejected', 'Pending'].includes(status)) {
+    if (!status || !['Approved', 'Rejected', 'Pending'].includes(status)) {
       return res.status(400).json({ message: 'Invalid status value' });
     }
 
-    const updateData = {
-      status,
-      approvedAmount: status === 'Approved' ? req.body.approvedAmount : null,
-      insurerComments: req.body.comments || ''
-    };
-
-    const claim = await Claim.findByIdAndUpdate(
-      req.params.id,
-      updateData,
-      { new: true, runValidators: true }
-    );
-
-    if (!claim) return res.status(404).json({ message: 'Claim not found' });
+    // Find claim first
+    const claim = await Claim.findById(id);
     
-    res.json(claim);
+    if (!claim) {
+      return res.status(404).json({ message: 'Claim not found' });
+    }
+    
+    // Update the claim fields
+    claim.status = status;
+    claim.insurerComments = comments || '';
+    
+    if (status === 'Approved') {
+      claim.approvedAmount = parseFloat(approvedAmount) || 0;
+    }
+    
+    // Save the updated claim
+    await claim.save();
+    
+    console.log('Claim updated successfully:', claim);
+    res.status(200).json(claim);
   } catch (error) {
+    console.error('Error updating claim:', error);
     res.status(500).json({
       message: 'Failed to update claim',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      error: error.message
     });
   }
 };

@@ -44,18 +44,20 @@ export const submitClaim = createAsyncThunk(
   }
 );
 
-// Fixed: Using consistent API import and correct URL format
+// redux/slices/claimSlice.js - updateClaimStatus function
 export const updateClaimStatus = createAsyncThunk(
   "claims/updateClaimStatus", 
-  async ({ claimId, ...data }, { rejectWithValue }) => {
+  async ({ claimId, status, approvedAmount, comments }, { rejectWithValue }) => {
     try {
+      console.log('Updating claim status:', { claimId, status, approvedAmount, comments });
+      
       const response = await api.put(
         `/claims/${claimId}`, 
-        data
-        // Token will be added by interceptor
+        { status, approvedAmount, comments }
       );
       return response.data;
     } catch (error) {
+      console.error('Update claim error:', error.response?.data || error.message);
       return rejectWithValue(error.response?.data?.message || "Failed to update claim");
     }
   }

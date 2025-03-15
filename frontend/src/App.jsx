@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
+import ClaimDebugTool from './components/ClaimDebugTool';
 import Homepage from "./pages/Homepage";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
@@ -15,6 +16,7 @@ function App() {
       <Toaster position="top-right" />
       <Navbar />
       <Routes>
+      <Route path="/debug" element={<ClaimDebugTool />} />
         <Route path="/" element={<Homepage />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
