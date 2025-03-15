@@ -56,8 +56,8 @@ Follow these steps to set up the project locally.
 
 ## **Access the Application**
 
-- **Frontend:** [http://localhost:5173](http://localhost:5173)
-- **Backend:** [http://localhost:8000](http://localhost:8000)
+- **Frontend:** [Claim-management-system](https://claim-management-system-git-main-sudhan1112s-projects.vercel.app/)
+- **Backend:** [Render-Deployed-link](https://claim-management-system-4.onrender.com)
 
 ## **API Documentation**
 [View API Docs](https://docs.google.com/document/d/1dQ4rJwvYVM111uJczvyz2AgbPSk8S6RPArrnr27zTM0/edit?usp=sharing)
