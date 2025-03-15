@@ -7,6 +7,7 @@ import connectDB from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import claimRoutes from './routes/claimRoutes.js';
 
+
 // Configure environment variables
 dotenv.config();
 

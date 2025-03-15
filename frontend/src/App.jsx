@@ -7,10 +7,12 @@ import PatientDashboard from "./pages/PatientDashboard";
 import InsurerDashboard from "./pages/InsurerDashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import SubmitClaim from "./pages/SubmitClaim";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   return (
     <Router>
+      <Toaster position="top-right" />
       <Navbar />
       <Routes>
         <Route path="/" element={<Homepage />} />

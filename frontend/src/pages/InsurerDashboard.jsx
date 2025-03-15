@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchClaims, updateClaimStatus } from "../redux/slices/claimSlice"; // ✅ Import correctly
+import { fetchClaims, updateClaimStatus } from "../redux/slices/claimSlice";
 
 const InsurerDashboard = () => {
   const dispatch = useDispatch();
@@ -10,11 +10,21 @@ const InsurerDashboard = () => {
     dispatch(fetchClaims());
   }, [dispatch]);
 
-  const handleUpdateStatus = (claimId, status) => {
-    const approvedAmount = prompt("Enter approved amount:");
-    const comments = prompt("Enter comments:");
-    if (approvedAmount && comments) {
-      dispatch(updateClaimStatus({ claimId, status, approvedAmount, comments }));
+  const handleUpdateStatus = async (claimId, status) => {
+    if (!window.confirm(`Are you sure you want to ${status} this claim?`)) return;
+
+    try {
+      // Fixed: Removed undefined data variable, only passing necessary data
+      await dispatch(updateClaimStatus({ 
+        claimId, 
+        status,
+        comments: status === "Rejected" ? "Claim rejected by insurer" : "Claim approved by insurer"
+      })).unwrap();
+      
+      dispatch(fetchClaims()); // Refresh list
+      alert('Update successful!');
+    } catch (error) {
+      alert(`Update failed: ${error}`);
     }
   };
 
@@ -37,12 +47,14 @@ const InsurerDashboard = () => {
               <button
                 className="bg-green-500 text-white px-3 py-1 rounded m-2"
                 onClick={() => handleUpdateStatus(claim._id, "Approved")}
+                disabled={claim.status === "Approved" || claim.status === "Rejected"}
               >
                 Approve
               </button>
               <button
                 className="bg-red-500 text-white px-3 py-1 rounded"
                 onClick={() => handleUpdateStatus(claim._id, "Rejected")}
+                disabled={claim.status === "Approved" || claim.status === "Rejected"}
               >
                 Reject
               </button>

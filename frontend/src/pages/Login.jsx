@@ -2,36 +2,62 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../redux/slices/authSlice";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
 
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading, error } = useSelector((state) => state.auth);
-
-  const [formData, setFormData] = useState({ email: "", password: "" });
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const { loading } = useSelector((state) => state.auth);
+  const [credentials, setCredentials] = useState({ email: "", password: "" });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const result = await dispatch(loginUser(formData));
-    if (loginUser.fulfilled.match(result)) {
-      navigate(result.payload.user.role === "patient" ? "/patient-dashboard" : "/insurer-dashboard");
+    try {
+      const result = await dispatch(loginUser(credentials));
+      
+      if (loginUser.fulfilled.match(result)) {
+        toast.success("Login successful!");
+        navigate(result.payload.user.role === "patient" 
+          ? "/patient-dashboard" 
+          : "/insurer-dashboard"
+        );
+      }
+      
+      if (loginUser.rejected.match(result)) {
+        toast.error(result.payload || "Login failed");
+      }
+    } catch (error) {
+      toast.error("An unexpected error occurred");
     }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
-      <h2 className="text-2xl font-bold mb-4">Login</h2>
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md w-80">
-        <input type="email" name="email" placeholder="Email" onChange={handleChange} required className="w-full p-2 mb-2 border rounded" />
-        <input type="password" name="password" placeholder="Password" onChange={handleChange} required className="w-full p-2 mb-2 border rounded" />
-        <button type="submit" disabled={loading} className="w-full bg-blue-500 text-white p-2 rounded">
-          {loading ? "Logging in..." : "Login"}
+    <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded shadow">
+      <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <input
+          type="email"
+          placeholder="Email"
+          required
+          className="w-full p-2 border rounded"
+          value={credentials.email}
+          onChange={(e) => setCredentials({...credentials, email: e.target.value})}
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          required
+          className="w-full p-2 border rounded"
+          value={credentials.password}
+          onChange={(e) => setCredentials({...credentials, password: e.target.value})}
+        />
+        <button 
+          type="submit" 
+          disabled={loading}
+          className="w-full bg-blue-600 text-white p-2 rounded disabled:opacity-50"
+        >
+          {loading ? "Authenticating..." : "Login"}
         </button>
-        {error && <p className="text-red-500 mt-2">{error}</p>}
       </form>
     </div>
   );

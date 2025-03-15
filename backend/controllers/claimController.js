@@ -1,8 +1,12 @@
-// controllers/claimController.js
 import Claim from "../models/claimModel.js";
 
 export const getClaims = async (req, res) => {
   try {
+    // Only allow insurers to see all claims
+    if (req.user.role !== 'insurer') {
+      return res.status(403).json({ message: "Access denied. Insurer role required." });
+    }
+    
     const claims = await Claim.find().populate("userId", "name email role");
     res.json(claims);
   } catch (error) {
@@ -12,30 +16,70 @@ export const getClaims = async (req, res) => {
 
 export const getUserClaims = async (req, res) => {
   try {
-    const claims = await Claim.find({ userId: req.user.userId });
+    // Allow patients to only view their own claims
+    // Allow insurers to view any user's claims
+    const userId = req.params.userId;
+    
+    if (req.user.role !== 'insurer' && req.user.userId.toString() !== userId) {
+      return res.status(403).json({ message: "Access denied. You can only view your own claims." });
+    }
+    
+    const claims = await Claim.find({ userId: userId })
+      .sort({ createdAt: -1 }); // Newest first
     res.json(claims);
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ 
+      message: 'Failed to fetch user claims',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 };
 
 export const updateClaim = async (req, res) => {
   try {
-    const { status, approvedAmount, comments } = req.body;
+    // Only insurers can update claims
+    if (req.user.role !== 'insurer') {
+      return res.status(403).json({ message: "Access denied. Insurer role required." });
+    }
+    
+    const { status } = req.body;
+    
+    // Validation
+    if (!['Approved', 'Rejected', 'Pending'].includes(status)) {
+      return res.status(400).json({ message: 'Invalid status value' });
+    }
+
+    const updateData = {
+      status,
+      approvedAmount: status === 'Approved' ? req.body.approvedAmount : null,
+      insurerComments: req.body.comments || ''
+    };
+
     const claim = await Claim.findByIdAndUpdate(
       req.params.id,
-      { status, approvedAmount, insurerComments: comments },
-      { new: true }
+      updateData,
+      { new: true, runValidators: true }
     );
-    res.json({ message: "Claim updated", claim });
+
+    if (!claim) return res.status(404).json({ message: 'Claim not found' });
+    
+    res.json(claim);
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({
+      message: 'Failed to update claim',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 };
 
 export const submitClaim = async (req, res) => {
   try {
     const { name, email, claimAmount, description } = req.body;
+    
+    // Only patients can submit claims
+    if (req.user.role !== 'patient') {
+      return res.status(403).json({ message: "Access denied. Only patients can submit claims." });
+    }
     
     if (!req.file) {
       return res.status(400).json({ message: "Document is required" });
