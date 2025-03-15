@@ -19,7 +19,7 @@ A full-stack application for managing insurance claims. Built with **React**, **
 ## **Screenshots**
 | Patient Dashboard | Insurer Dashboard |
 |-------------------|-------------------|
-| ![Patient Dashboard](![image](https://github.com/user-attachments/assets/23580635-ef1c-480f-b3b7-0525739a9f08) | ![Insurer Dashboard](![image](https://github.com/user-attachments/assets/9dfc031a-730b-41e4-9a6e-56f5779a5cdf) |
+|![image](https://github.com/user-attachments/assets/9f3716fe-85ad-48ac-b821-844029d0e386) | ![image](https://github.com/user-attachments/assets/28b52b1d-b8cc-41fb-a29c-b44dcf136076) |
 
 ---
 
