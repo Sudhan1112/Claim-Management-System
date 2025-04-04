@@ -8,12 +8,6 @@ A full-stack application for managing insurance claims. Built with **React**, **
 - **Insurer Dashboard**: Approve or reject claims.
 - **Authentication**: Secure login and signup with JWT.
 - **File Uploads**: Support for document uploads (PDF, JPG, PNG).
-
----
-
-## **Live Demo**
-[View Live Demo](#) <!-- Add a live demo link if available -->
-
 ---
 
 ## **Screenshots**
