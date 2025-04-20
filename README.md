@@ -1,5 +1,4 @@
 # Claims Management System
-A full-stack application for managing insurance claims. Built with **React**, **Redux**, **Node.js**, **Express**, and **MongoDB**.
 
 ---
 
