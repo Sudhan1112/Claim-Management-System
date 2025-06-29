@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  mongo: 
+    image: mongo
+    ports: 
+      - "27017:27017"
+    volumes: 
+      - mongo-data:/data/db
+
+  backend:
+    build: ./backend
+    image: sudhan1112/claim-backend:latest 
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/claimsDB
+
+  frontend:
+    build: ./frontend
+    image: sudhan1112/claim-frontend:latest 
+    ports:
+      - "8080:80" 
+    depends_on:
+      - backend
+
+volumes:
+  mongo-data:
